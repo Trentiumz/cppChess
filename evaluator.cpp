@@ -28,6 +28,7 @@ namespace Evaluator{
         // fill in which squares are attacked by the enemy
         preprocess::fillAttacked(curBoard, attackedSquares[layers], whiteToMove);
 
+        // TODO filling moves add to the vector; which changes its size; make it so that you don't need to change size(use a 2d list possibleMoves[layers][index]?)
         vector<turn> possibleMoves;
         fillMoves::fillValidMoves(curBoard, whiteToMove, threats[layers], numThreats, attackedSquares[layers], possibleMoves);
 

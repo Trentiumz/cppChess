@@ -82,6 +82,7 @@ inline float getPieceRating(piece *p, int row, int col) {
 }
 
 float Board::getRating() {
+    // TODO add O(1) rating function
     float curRating = 0.0;
     for (int r = 0; r < ROWS; ++r)
         for (int c = 0; c < COLS; ++c) {
