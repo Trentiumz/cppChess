@@ -149,7 +149,6 @@ namespace boardEdit {
     }
 
     void printBoard(class Board &board) {
-        std::cout << "board!" << std::endl;
         for (auto &r : board.board) {
             for (auto &c : r) {
                 if (c) {
