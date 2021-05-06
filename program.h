@@ -83,6 +83,11 @@ typedef struct turn{
     int numMoves;
 } turn;
 
+struct evalInfo{
+    coord threats[MAX_LAYERS][ROWS * COLS];
+    bool attackedSquares[MAX_LAYERS][ROWS][COLS];
+};
+
 // equivalent of board from looking at it in debugger; row 0 is the top of the board and the side of black
 class Board {
 public:
@@ -113,7 +118,7 @@ namespace preprocess{
     void fillAttacked(class Board &curBoard, bool fill[ROWS][COLS], bool whiteToMove);
 }
 namespace Evaluator{
-    float getExpectedRating(class Board &curBoard, int layers, bool whiteToMove);
+    float getExpectedRating(class Board &curBoard, int layers, bool whiteToMove, evalInfo & stepper);
     int getAMT();
 }
 

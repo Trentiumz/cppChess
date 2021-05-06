@@ -22,7 +22,8 @@ bool startingIsWhites[8][8] = {{false, false, false, false, false, false, false,
                                {true,  true,  true,  true,  true,  true,  true,  true}};
 int main() {
     Board startingBoard(startingIDs, startingIsWhites);
-    float rating = Evaluator::getExpectedRating(startingBoard, 6, true);
+    evalInfo intermediateInfo{};
+    float rating = Evaluator::getExpectedRating(startingBoard, 6, true, intermediateInfo);
     cout << rating << endl;
     cout << Evaluator::getAMT() << endl;
     return 0;
