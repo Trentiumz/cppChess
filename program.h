@@ -97,15 +97,6 @@ public:
     coord whiteKing{};
     coord blackKing{};
 
-    float getRating();
-    void getTurnOf(coord start, coord end, turn & toEdit);
-    void getPromotionTurnOf(coord start, coord end, int promotionID, turn & toEdit);
-    inline piece *pieceAt(coord pos){return this->board[pos.row][pos.col];}
-
-    void doTurn(turn toDo);
-    void doMove(move toDo);
-    void undoLast();
-
     Board(int id[ROWS][COLS], bool isWhite[ROWS][COLS]);
 };
 
@@ -114,17 +105,29 @@ bool operator==(const coord &first, const coord &second);
 bool operator!=(const coord &first, const coord &second);
 
 namespace fillMoves{
-    void fillValidMoves(class Board *curBoard, bool whiteToMove, coord threats[ROWS * COLS], int numThreats,
+    void fillValidMoves(class Board &curBoard, bool whiteToMove, coord threats[ROWS * COLS], int numThreats,
                         bool attackedSquares[ROWS][COLS], std::vector<turn> &addTo);
 }
 namespace preprocess{
-    int fillThreats(class Board *curBoard, bool whiteToMove, coord threats[ROWS * COLS]);
-    void fillAttacked(class Board *curBoard, bool fill[ROWS][COLS], bool whiteToMove);
+    int fillThreats(class Board &curBoard, bool whiteToMove, coord threats[ROWS * COLS]);
+    void fillAttacked(class Board &curBoard, bool fill[ROWS][COLS], bool whiteToMove);
 }
 namespace Evaluator{
-    float getExpectedRating(class Board *curBoard, int layers, bool whiteToMove);
+    float getExpectedRating(class Board &curBoard, int layers, bool whiteToMove);
     int getAMT();
 }
 
-void printBoard(class Board *curBoard);
+namespace boardEdit{
+    inline piece *pieceAt(Board &board, coord &piece);
+    void doTurn(turn toDo, Board &board);
+    void getTurnOf(coord start, coord end, turn &toEdit, Board &board);
+    void getPromotionTurnOf(coord start, coord end, int promotionID, turn &toEdit, Board &board);
+    void undoLast(Board &board);
+    void printBoard(class Board &board);
+}
+
+namespace rating{
+    float getRating(class Board &board);
+}
+
 #endif //CHESSENGINE_PROGRAM_H

@@ -12,12 +12,11 @@ namespace Evaluator{
     bool attackedSquares[MAX_LAYERS][ROWS][COLS];
 
     int amt = 0;
-    float temp = 0;
     int getAMT(){return amt;}
     // INCOMPLETE
-    float getExpectedRating(class Board *curBoard, int layers, bool whiteToMove) {
+    float getExpectedRating(class Board &curBoard, int layers, bool whiteToMove) {
         if (layers == 1){
-            return curBoard->getRating();
+            return rating::getRating(curBoard);
         }
         ++amt;
 
@@ -34,16 +33,16 @@ namespace Evaluator{
 
         float optimal = whiteToMove ? FLOAT_MIN : FLOAT_MAX;
         for(turn curTurn : possibleMoves){
-            curBoard->doTurn(curTurn);
+            boardEdit::doTurn(curTurn, curBoard);
             if(whiteToMove)
                 optimal = max(optimal, getExpectedRating(curBoard, layers - 1, !whiteToMove));
             else
                 optimal = min(optimal, getExpectedRating(curBoard, layers - 1, !whiteToMove));
-            curBoard->undoLast();
+            boardEdit::undoLast(curBoard);
         }
 
         if(optimal > 1000.0 || optimal < -1000.0){
-            printBoard(curBoard);
+            boardEdit::printBoard(curBoard);
         }
 
         return optimal;

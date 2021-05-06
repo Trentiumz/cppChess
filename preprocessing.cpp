@@ -10,14 +10,14 @@ namespace preprocess{
 
 // Updates the pieces that are in a piece's path to the king and returns if the path up to the king is hopelessly blocked
 // Moves in the direction of the king; in one of the 8 directions, whichever one is the direction towards the king
-    inline bool blockedInPathToKing(piece *curPiece, class Board *curBoard, coord &enemyKingCoord, int &r, int &c) {
+    inline bool blockedInPathToKing(piece *curPiece, class Board &curBoard, coord &enemyKingCoord, int &r, int &c) {
         int rDiff = sigNum(enemyKingCoord.row - r);
         int cDiff = sigNum(enemyKingCoord.col - c);
         // Loop through coords up to but not including the king
         for (int cr = r + rDiff, cc = c + cDiff; cr != enemyKingCoord.row || cc != enemyKingCoord.col; cr += rDiff, cc += cDiff) {
-            if (curBoard->board[cr][cc] == nullptr)
+            if (curBoard.board[cr][cc] == nullptr)
                 continue;
-            if (curBoard->board[cr][cc]->isWhite == curPiece->isWhite)
+            if (curBoard.board[cr][cc]->isWhite == curPiece->isWhite)
                 return true;
             // piece is a piece of opposite color
             if (curPiece->numPiecesInPath >= 2)
@@ -28,9 +28,9 @@ namespace preprocess{
     }
 
 // Updates the current piece so that it has pieces in its path to the king, and also updates whether or not it checks; returns if the piece is a threat
-    bool isThreatToKing(class Board *curBoard, int r, int c) {
-        piece *curPiece = curBoard->board[r][c];
-        coord enemyKingCoord = curPiece->isWhite ? curBoard->blackKing : curBoard->whiteKing;
+    bool isThreatToKing(class Board &curBoard, int r, int c) {
+        piece *curPiece = curBoard.board[r][c];
+        coord enemyKingCoord = curPiece->isWhite ? curBoard.blackKing : curBoard.whiteKing;
 
         int rDiff, cDiff;
         curPiece->numPiecesInPath = 0;
@@ -76,11 +76,11 @@ namespace preprocess{
     }
 
 // returns number of threats
-    int fillThreats(class Board *curBoard, bool whiteToMove, coord threats[ROWS * COLS]) {
+    int fillThreats(class Board &curBoard, bool whiteToMove, coord threats[ROWS * COLS]) {
         int numThreats = 0;
         for (int r = 0; r < ROWS; ++r)
             for (int c = 0; c < COLS; ++c) {
-                if (curBoard->board[r][c] != nullptr && curBoard->board[r][c]->isWhite != whiteToMove)
+                if (curBoard.board[r][c] != nullptr && curBoard.board[r][c]->isWhite != whiteToMove)
                     if (isThreatToKing(curBoard, r, c))
                         threats[numThreats++] = {r, c};
             }
@@ -90,16 +90,16 @@ namespace preprocess{
 // FILL ATTACKED -----------------------------------------------------------------------------
 
 // Marches in one direction, setting all elements to true up and including until it hits a piece
-    inline void updateInDirection(class Board *curBoard, bool fill[ROWS][COLS], int row, int col, int rDiff, int cDiff) {
+    inline void updateInDirection(class Board &curBoard, bool fill[ROWS][COLS], int row, int col, int rDiff, int cDiff) {
         for (row += rDiff, col += cDiff; 0 <= row && row < ROWS && 0 <= col && col < COLS; row += rDiff, col += cDiff) {
             fill[row][col] = true;
-            if (curBoard->board[row][col] != nullptr)
+            if (curBoard.board[row][col] != nullptr)
                 break;
         }
     }
 
-    void updateSurroundings(class Board *curBoard, bool fill[ROWS][COLS], int row, int col) {
-        piece *curPiece = curBoard->board[row][col];
+    void updateSurroundings(class Board &curBoard, bool fill[ROWS][COLS], int row, int col) {
+        piece *curPiece = curBoard.board[row][col];
         switch (curPiece->id) {
             case PAWN: {
                 int pDiff = curPiece->isWhite ? -1 : 1;
@@ -140,13 +140,13 @@ namespace preprocess{
         }
     }
 
-    void fillAttacked(class Board *curBoard, bool fill[ROWS][COLS], bool whiteToMove) {
+    void fillAttacked(class Board &curBoard, bool fill[ROWS][COLS], bool whiteToMove) {
         for (int r = 0; r < ROWS; ++r)
             for (int c = 0; c < COLS; ++c)
                 fill[r][c] = false;
         for (int r = 0; r < ROWS; ++r)
             for (int c = 0; c < COLS; ++c)
-                if (curBoard->board[r][c] != nullptr && curBoard->board[r][c]->isWhite != whiteToMove) {
+                if (curBoard.board[r][c] != nullptr && curBoard.board[r][c]->isWhite != whiteToMove) {
                     updateSurroundings(curBoard, fill, r, c);
                 }
     }

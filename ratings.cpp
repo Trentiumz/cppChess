@@ -77,21 +77,26 @@ const float ratingMultiplier[ELEMENT_TYPES][ROWS][COLS] = {
 
 // RATINGS -----------------------------------------------------------------------------
 
-inline float getPieceRating(piece *p, int row, int col) {
-    return (p->isWhite ? 1.0f : -1.0f) * (pieceRatings[p->id] + (!p->isWhite ? ratingMultiplier[p->id][row][col] : ratingMultiplier[p->id][ROWS - row - 1][col]));
-}
+namespace rating {
 
-float Board::getRating() {
-    // TODO add O(1) rating function
-    float curRating = 0.0;
-    for (int r = 0; r < ROWS; ++r)
-        for (int c = 0; c < COLS; ++c) {
-            if (this->board[r][c] != nullptr) {
-                // ::getRating is for a global function
-                curRating += ::getPieceRating(this->board[r][c], r, c);
+    inline float getPieceRating(piece *p, int row, int col) {
+        return (p->isWhite ? 1.0f : -1.0f) * (pieceRatings[p->id] + (!p->isWhite ? ratingMultiplier[p->id][row][col]
+                                                                                 : ratingMultiplier[p->id][ROWS - row -
+                                                                                                           1][col]));
+    }
+
+    float getRating(Board &board) {
+        // TODO add O(1) rating function
+        float curRating = 0.0;
+        for (int r = 0; r < ROWS; ++r)
+            for (int c = 0; c < COLS; ++c) {
+                if (board.board[r][c] != nullptr) {
+                    // ::getRating is for a global function
+                    curRating += getPieceRating(board.board[r][c], r, c);
+                }
             }
-        }
-    return curRating;
+        return curRating;
+    }
 }
 
 // GETTING THREATS -----------------------------------------------------------------------------
