@@ -11,10 +11,10 @@ namespace Evaluator {
     using namespace std;
 
     float getExpectedRating(class Board &curBoard, int layers, bool whiteToMove, evalInfo &stepper) {
+        ++stepper.amt;
         if (layers <= 1) {
             return rating::getRating(curBoard);
         }
-        ++stepper.amt;
 
         // PREPROCESSING
         // Fill the threats
