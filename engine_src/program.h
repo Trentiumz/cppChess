@@ -26,6 +26,8 @@ const int allDirectionMoves[8][2] = {{1, 1}, {1, -1}, {-1, 1}, {-1, -1}, {1, 0},
 #define KING 5
 #define EMPTY (-1)
 
+#define MAX_MOVES_PER_TURN 200
+
 const int promoteables[4] = {BISHOP, KNIGHT, ROOK, QUEEN};
 
 #define MOVE 0
@@ -86,6 +88,8 @@ typedef struct turn{
 struct evalInfo{
     coord threats[MAX_LAYERS][ROWS * COLS];
     bool attackedSquares[MAX_LAYERS][ROWS][COLS];
+    turn possibleMoves[MAX_LAYERS][MAX_MOVES_PER_TURN];
+    int numMoves[MAX_LAYERS];
     int amt;
 };
 
@@ -112,7 +116,7 @@ bool operator!=(const coord &first, const coord &second);
 
 namespace fillMoves{
     void fillValidMoves(class Board &curBoard, bool whiteToMove, coord threats[ROWS * COLS], int numThreats,
-                        bool attackedSquares[ROWS][COLS], std::vector<turn> &addTo);
+                        bool attackedSquares[ROWS][COLS], turn turns[MAX_MOVES_PER_TURN], int& numMoves);
 }
 namespace preprocess{
     int fillThreats(class Board &curBoard, bool whiteToMove, coord threats[ROWS * COLS]);

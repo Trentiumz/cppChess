@@ -165,58 +165,56 @@ namespace fillMoves {
 
 /// considerPieceTurn: This function doesn't work for king's, those will be rendered by using the "map of influence" from the other pieces
     inline void
-    considerPieceTurn(class Board &curBoard, coord start, coord end, vector<turn> &addTo, coord *threats,
+    considerPieceTurn(class Board &curBoard, coord start, coord end, turn turns[MAX_MOVES_PER_TURN], int &numTurns, coord *threats,
                       int numThreats) {
         if (isPieceMoveValid(curBoard, start, end, threats, numThreats)) {
             if ((end.row == 0 || end.row == 7) && pieceAt(curBoard, start)->id == PAWN) {
                 for (int id : promoteables) {
-                    addTo.push_back({});
-                    getPromotionTurnOf(start, end, id, addTo.back(), curBoard);
+                    getPromotionTurnOf(start, end, id, turns[numTurns++], curBoard);
                 }
             } else {
-                addTo.push_back({});
-                getTurnOf(start, end, addTo.back(), curBoard);
+                getTurnOf(start, end, turns[numTurns++], curBoard);
             }
         }
     }
 
     void
-    considerMovesInDirection(class Board &curBoard, coord &start, vector<turn> &addTo, coord *threats, int numThreats,
+    considerMovesInDirection(class Board &curBoard, coord &start, turn turns[MAX_MOVES_PER_TURN], int &numMoves, coord *threats, int numThreats,
                              const int direction[2]) {
         for (int r = start.row + direction[0], c = start.col + direction[1];
              0 <= r && r < ROWS && 0 <= c && c < COLS; r += direction[0], c += direction[1]) {
             if (curBoard.board[r][c] == nullptr)
-                considerPieceTurn(curBoard, start, {r, c}, addTo, threats, numThreats);
+                considerPieceTurn(curBoard, start, {r, c}, turns, numMoves, threats, numThreats);
             else if (curBoard.board[r][c]->isWhite == pieceAt(curBoard, start)->isWhite)
                 break;
             else {
-                considerPieceTurn(curBoard, start, {r, c}, addTo, threats, numThreats);
+                considerPieceTurn(curBoard, start, {r, c}, turns, numMoves, threats, numThreats);
                 break;
             }
         }
     }
 
 /// addMoves: For some piece, add all of the adjacent moves
-    void addMoves(class Board &curBoard, coord start, coord threats[ROWS * COLS], int numThreats, vector<turn> &addTo,
+    void addMoves(class Board &curBoard, coord start, coord threats[ROWS * COLS], int numThreats, turn turns[MAX_MOVES_PER_TURN], int& numMoves,
                   bool attacked[ROWS][COLS]) {
         piece *curPiece = pieceAt(curBoard, start);
         switch (curPiece->id) {
             case PAWN: {
                 int pawnDir = curPiece->isWhite ? -1 : 1;
                 if (!curBoard.board[start.row + pawnDir][start.col]) {
-                    considerPieceTurn(curBoard, start, {start.row + pawnDir, start.col}, addTo, threats, numThreats);
+                    considerPieceTurn(curBoard, start, {start.row + pawnDir, start.col}, turns, numMoves, threats, numThreats);
                     if (start.row == (curPiece->isWhite ? 6 : 1) &&
                         !curBoard.board[start.row + 2 * pawnDir][start.col] && !curPiece->didMove) {
-                        considerPieceTurn(curBoard, start, {start.row + 2 * pawnDir, start.col}, addTo, threats,
+                        considerPieceTurn(curBoard, start, {start.row + 2 * pawnDir, start.col}, turns, numMoves, threats,
                                           numThreats);
                     }
                 }
                 if (start.col < COLS - 1 && curBoard.board[start.row + pawnDir][start.col + 1]) {
-                    considerPieceTurn(curBoard, start, {start.row + pawnDir, start.col + 1}, addTo, threats,
+                    considerPieceTurn(curBoard, start, {start.row + pawnDir, start.col + 1}, turns, numMoves, threats,
                                       numThreats);
                 }
                 if (start.col > 0 && curBoard.board[start.row + pawnDir][start.col - 1]) {
-                    considerPieceTurn(curBoard, start, {start.row + pawnDir, start.col - 1}, addTo, threats,
+                    considerPieceTurn(curBoard, start, {start.row + pawnDir, start.col - 1}, turns, numMoves, threats,
                                       numThreats);
                 }
                 for (int epCol : {start.col - 1, start.col + 1}) {
@@ -227,7 +225,7 @@ namespace fillMoves {
                     if (start.row == enPassantRow && pieceAt(curBoard, enPassantCandidate) &&
                         pieceAt(curBoard, enPassantCandidate)->id == PAWN &&
                         pieceAt(curBoard, enPassantCandidate)->lastDoubleMove == curBoard.moveNum) {
-                        considerPieceTurn(curBoard, start, {start.row + pawnDir, start.col + 1}, addTo, threats,
+                        considerPieceTurn(curBoard, start, {start.row + pawnDir, start.col + 1}, turns, numMoves, threats,
                                           numThreats);
                     }
                 }
@@ -235,7 +233,7 @@ namespace fillMoves {
             }
             case BISHOP: {
                 for (auto direction : bishopMoves) {
-                    considerMovesInDirection(curBoard, start, addTo, threats, numThreats, direction);
+                    considerMovesInDirection(curBoard, start, turns, numMoves, threats, numThreats, direction);
                 }
                 return;
             }
@@ -244,19 +242,19 @@ namespace fillMoves {
                 for (auto direction : knightMoves) {
                     r = start.row + direction[0], c = start.col + direction[1];
                     if (0 <= r && r < ROWS && 0 <= c && c < COLS)
-                        considerPieceTurn(curBoard, start, {r, c}, addTo, threats, numThreats);
+                        considerPieceTurn(curBoard, start, {r, c}, turns, numMoves, threats, numThreats);
                 }
                 return;
             }
             case ROOK: {
                 for (auto direction : rookMoves) {
-                    considerMovesInDirection(curBoard, start, addTo, threats, numThreats, direction);
+                    considerMovesInDirection(curBoard, start, turns, numMoves, threats, numThreats, direction);
                 }
                 return;
             }
             case QUEEN: {
                 for (auto direction : allDirectionMoves) {
-                    considerMovesInDirection(curBoard, start, addTo, threats, numThreats, direction);
+                    considerMovesInDirection(curBoard, start, turns, numMoves, threats, numThreats, direction);
                 }
                 return;
             }
@@ -268,8 +266,7 @@ namespace fillMoves {
                         (!curBoard.board[r][c] || curBoard.board[r][c] &&
                                                   curBoard.board[r][c]->isWhite != pieceAt(curBoard, start)->isWhite) &&
                         !attacked[r][c]) {
-                        addTo.push_back({});
-                        getTurnOf(start, {r, c}, addTo.back(), curBoard);
+                        getTurnOf(start, {r, c}, turns[numMoves++], curBoard);
                     }
                 }
                 if (!curPiece->didMove) {
@@ -277,8 +274,7 @@ namespace fillMoves {
                         !attacked[start.row][start.col + 1] && !attacked[start.row][start.col + 2]) {
                         piece *rookAtRight = curBoard.board[start.row][start.col + 3];
                         if (rookAtRight && rookAtRight->id == ROOK && !rookAtRight->didMove) {
-                            addTo.push_back({});
-                            getTurnOf(start, {r, c + 3}, addTo.back(), curBoard);
+                            getTurnOf(start, {r, c + 3}, turns[numMoves++], curBoard);
                         }
                     }
                     if (!curBoard.board[start.row][start.col - 1] && !curBoard.board[start.row][start.col - 2] &&
@@ -287,8 +283,7 @@ namespace fillMoves {
                         !attacked[start.row][start.col - 3]) {
                         piece *rookAtLeft = curBoard.board[start.row][start.col - 3];
                         if (rookAtLeft && rookAtLeft->id == ROOK && !rookAtLeft->didMove) {
-                            addTo.push_back({});
-                            getTurnOf(start, {r, c - 3}, addTo.back(), curBoard);
+                            getTurnOf(start, {r, c - 3}, turns[numMoves++], curBoard);
                         }
                     }
                 }
@@ -298,11 +293,11 @@ namespace fillMoves {
     }
 
     void fillValidMoves(class Board &curBoard, bool whiteToMove, coord threats[ROWS * COLS], int numThreats,
-                        bool attackedSquares[ROWS][COLS], vector<turn> &addTo) {
+                        bool attackedSquares[ROWS][COLS], turn turns[MAX_MOVES_PER_TURN], int& numMoves) {
         for (int r = 0; r < ROWS; ++r)
             for (int c = 0; c < COLS; ++c) {
                 if (curBoard.board[r][c] && curBoard.board[r][c]->isWhite == whiteToMove) {
-                    addMoves(curBoard, {r, c}, threats, numThreats, addTo, attackedSquares);
+                    addMoves(curBoard, {r, c}, threats, numThreats, turns, numMoves, attackedSquares);
                 }
             }
     }

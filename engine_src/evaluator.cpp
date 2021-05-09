@@ -3,6 +3,8 @@
 //
 
 #include <iostream>
+#include <thread>
+#include <chrono>
 #include "program.h"
 
 namespace Evaluator {
@@ -21,14 +23,13 @@ namespace Evaluator {
         // fill in which squares are attacked by the enemy
         preprocess::fillAttacked(curBoard, stepper.attackedSquares[layers], whiteToMove);
 
-        // TODO filling moves add to the vector; which changes its size; make it so that you don't need to change size(use a 2d list possibleMoves[layers][index]?)
-        vector<turn> possibleMoves;
+        stepper.numMoves[layers] = 0;
         fillMoves::fillValidMoves(curBoard, whiteToMove, stepper.threats[layers], numThreats,
-                                  stepper.attackedSquares[layers], possibleMoves);
+                                  stepper.attackedSquares[layers], stepper.possibleMoves[layers], stepper.numMoves[layers]);
 
         float optimal = whiteToMove ? FLOAT_MIN : FLOAT_MAX;
-        for (turn curTurn : possibleMoves) {
-            boardEdit::doTurn(curTurn, curBoard);
+        for (int turnInd = 0; turnInd < stepper.numMoves[layers]; ++turnInd) {
+            boardEdit::doTurn(stepper.possibleMoves[layers][turnInd], curBoard);
             if (whiteToMove)
                 optimal = max(optimal, getExpectedRating(curBoard, layers - 1, !whiteToMove, stepper));
             else
@@ -48,7 +49,8 @@ namespace Evaluator {
         evalInfo info{};
         class Board b(startingIDs, startingIsWhite, moved, startingDidMove);
         boardEdit::doTurn(toDo, b);
-        returnTo = getExpectedRating(b, layers, whiteToMove, info);
+        float thing = getExpectedRating(b, layers, whiteToMove, info);
         cout << info.amt << endl;
+        returnTo = thing;
     }
 }

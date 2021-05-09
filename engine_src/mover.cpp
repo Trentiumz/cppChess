@@ -19,16 +19,18 @@ namespace Mover{
         int numThreats = preprocess::fillThreats(sampleBoard, whiteToMove, threats);
         preprocess::fillAttacked(sampleBoard, attacked, whiteToMove);
 
-        vector<turn> addTo;
-        fillMoves::fillValidMoves(sampleBoard, whiteToMove, threats, numThreats, attacked, addTo);
+        turn possibleTurns[MAX_MOVES_PER_TURN];
+        int numMoves = 0;
+        fillMoves::fillValidMoves(sampleBoard, whiteToMove, threats, numThreats, attacked, possibleTurns, numMoves);
 
         vector<thread> evaluations;
-        evaluations.reserve(addTo.size());
+        evaluations.reserve(numMoves);
 
-        for(int i = 0; i < addTo.size(); ++i){
-//            Evaluator::setExpectedRating(startingIDs, startingIsWhites, startingDidMove, doubleMove, addTo[i], layers - 1, !whiteToMove, ratings[i]);
-            evaluations.emplace_back(Evaluator::setExpectedRating, startingIDs, startingIsWhites, startingDidMove, doubleMove, addTo[i], layers - 1, !whiteToMove, ref(ratings[i]));
+        for(int i = 0; i < numMoves; ++i){
+//            Evaluator::setExpectedRating(startingIDs, startingIsWhites, startingDidMove, doubleMove, possibleTurns[i], layers - 1, !whiteToMove, ratings[i]);
+            evaluations.emplace_back(Evaluator::setExpectedRating, ref(startingIDs), ref(startingIsWhites), ref(startingDidMove), doubleMove, possibleTurns[i], layers - 1, !whiteToMove, ref(ratings[i]));
         }
+        cout << "threads added" << endl;
 
         for(auto & evaluation : evaluations){
             evaluation.join();
@@ -37,16 +39,16 @@ namespace Mover{
         float optimalRating = whiteToMove ? -10000 : 10000;
         moveLite optimalMove{};
 
-        for(int i = 0; i < addTo.size(); ++i){
+        for(int i = 0; i < numMoves; ++i){
             float n = ratings[i];
             if(whiteToMove && ratings[i] > optimalRating || !whiteToMove && ratings[i] < optimalRating){
                 optimalRating = ratings[i];
-                for(int m = 0; m < addTo[i].numMoves; ++m){
-                    if(addTo[i].moves[m].type == MOVE){
-                        optimalMove.start = addTo[i].moves[m].start;
-                        optimalMove.end = addTo[i].moves[m].end;
-                    }else if(addTo[i].moves[m].type == PROMOTE){
-                        optimalMove.promotionID = addTo[i].moves[m].promotionID;
+                for(int m = 0; m < possibleTurns[i].numMoves; ++m){
+                    if(possibleTurns[i].moves[m].type == MOVE){
+                        optimalMove.start = possibleTurns[i].moves[m].start;
+                        optimalMove.end = possibleTurns[i].moves[m].end;
+                    }else if(possibleTurns[i].moves[m].type == PROMOTE){
+                        optimalMove.promotionID = possibleTurns[i].moves[m].promotionID;
                     }
                 }
             }

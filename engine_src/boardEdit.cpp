@@ -53,6 +53,7 @@ namespace boardEdit {
 /// Board::getTurnOf: gets the turn equivalent of a move, doesn't support editing
     void getTurnOf(coord start, coord end, turn &toEdit, Board &board) {
         piece *curPiece = pieceAt(board, start);
+        toEdit.numMoves = 0;
         // King Castling
         if (curPiece->id == KING && abs(end.col - start.col) == 2) {
             toEdit.moves[toEdit.numMoves] = {MOVE, start, end};
@@ -103,6 +104,7 @@ namespace boardEdit {
     }
 
     void getPromotionTurnOf(coord start, coord end, int promotionID, turn &toEdit, Board &board) {
+        toEdit.numMoves = 0;
         if (abs(end.col - start.col) == 1) {
             toEdit.moves[toEdit.numMoves] = {REMOVE, end};
             toEdit.moves[toEdit.numMoves].captured = pieceAt(board, end);

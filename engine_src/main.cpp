@@ -30,7 +30,7 @@ bool startingDidMove[8][8] = {{false, false, false, false, false, false, false, 
                               {false, false, false, false, false, false, false, false}};
 
 int main() {
-    Mover::moveLite toDo = Mover::getOptimalMove(startingIDs, startingIsWhites, startingDidMove, {-1, -1}, true, 6);
+    Mover::moveLite toDo = Mover::getOptimalMove(startingIDs, startingIsWhites, startingDidMove, {-1, -1}, true, 7);
     cout << "(" << toDo.start.row << " " << toDo.start.col << ")" << " to " << "(" << toDo.end.row << " " << toDo.end.col << ")" << endl;
     return 0;
 }
