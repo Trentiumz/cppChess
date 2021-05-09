@@ -8,16 +8,11 @@
 namespace Evaluator {
     using namespace std;
 
-    int amt = 0;
-
-    int getAMT() { return amt; }
-
-    // INCOMPLETE
     float getExpectedRating(class Board &curBoard, int layers, bool whiteToMove, evalInfo &stepper) {
-        if (layers == 1) {
+        if (layers <= 1) {
             return rating::getRating(curBoard);
         }
-        ++amt;
+        ++stepper.amt;
 
         // PREPROCESSING
         // Fill the threats
@@ -42,10 +37,18 @@ namespace Evaluator {
         }
 
         if (optimal > 1000.0 || optimal < -1000.0) {
-            std::cout << "Extreme optimal rating of " << optimal << " found\n";
-            boardEdit::printBoard(curBoard);
+//            std::cout << "Extreme optimal rating of " << optimal << " found\n";
+//            boardEdit::printBoard(curBoard);
         }
 
         return optimal;
+    }
+
+    void setExpectedRating(int startingIDs[ROWS][COLS], bool startingIsWhite[ROWS][COLS], bool startingDidMove[ROWS][COLS], coord moved, turn toDo, int layers, bool whiteToMove, float &returnTo){
+        evalInfo info{};
+        class Board b(startingIDs, startingIsWhite, moved, startingDidMove);
+        boardEdit::doTurn(toDo, b);
+        returnTo = getExpectedRating(b, layers, whiteToMove, info);
+        cout << info.amt << endl;
     }
 }

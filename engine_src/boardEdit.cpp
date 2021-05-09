@@ -3,6 +3,7 @@
 //
 #include <iostream>
 #include <cmath>
+#include <algorithm>
 #include "program.h"
 
 
@@ -160,22 +161,24 @@ namespace boardEdit {
             std::cout << std::endl;
         }
     }
-
 }
 
-Board::Board(int id[ROWS][COLS], bool isWhite[ROWS][COLS]) {
+Board::Board(int id[8][8], bool isWhite[8][8], coord doubleMoved, bool didMove[8][8]) {
     int numPieces = 0;
     for (int r = 0; r < ROWS; ++r)
         for (int c = 0; c < COLS; ++c)
             if (id[r][c] != EMPTY) {
-                pieces[numPieces] = {id[r][c], isWhite[r][c], false, NEVERDOUBLEMOVED_VAL};
-                board[r][c] = &pieces[numPieces++];
+                if(r == doubleMoved.row && c == doubleMoved.col)
+                    this->pieces[numPieces] = {id[r][c], isWhite[r][c], didMove[r][c], this->moveNum};
+                else
+                    this->pieces[numPieces] = {id[r][c], isWhite[r][c], didMove[r][c], NEVERDOUBLEMOVED_VAL};
+                this->board[r][c] = &pieces[numPieces++];
 
                 if (id[r][c] == KING) {
                     if (isWhite[r][c])
-                        whiteKing = {r, c};
+                        this->whiteKing = {r, c};
                     else
-                        blackKing = {r, c};
+                        this->blackKing = {r, c};
                 }
             }
 }

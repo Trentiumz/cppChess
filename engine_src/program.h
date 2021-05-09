@@ -86,6 +86,7 @@ typedef struct turn{
 struct evalInfo{
     coord threats[MAX_LAYERS][ROWS * COLS];
     bool attackedSquares[MAX_LAYERS][ROWS][COLS];
+    int amt;
 };
 
 // equivalent of board from looking at it in debugger; row 0 is the top of the board and the side of black
@@ -102,7 +103,7 @@ public:
     coord whiteKing{};
     coord blackKing{};
 
-    Board(int id[ROWS][COLS], bool isWhite[ROWS][COLS]);
+    Board(int id[8][8], bool isWhite[8][8], coord doubleMoved, bool didMove[8][8]);
 };
 
 int sigNum(int num);
@@ -119,7 +120,7 @@ namespace preprocess{
 }
 namespace Evaluator{
     float getExpectedRating(class Board &curBoard, int layers, bool whiteToMove, evalInfo & stepper);
-    int getAMT();
+    void setExpectedRating(int startingIDs[ROWS][COLS], bool startingIsWhite[ROWS][COLS], bool startingDidMove[ROWS][COLS], coord moved, turn toDo, int layers, bool whiteToMove, float &returnTo);
 }
 
 namespace boardEdit{
@@ -133,6 +134,14 @@ namespace boardEdit{
 
 namespace rating{
     float getRating(class Board &board);
+}
+
+namespace Mover{
+    struct moveLite{
+        coord start, end;
+        int promotionID;
+    };
+    moveLite getOptimalMove(int startingIDs[ROWS][COLS], bool startingIsWhites[ROWS][COLS], bool startingDidMove[ROWS][COLS], coord doubleMove, bool whiteToMove, int layers);
 }
 
 #endif //CHESSENGINE_PROGRAM_H

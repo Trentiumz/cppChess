@@ -20,11 +20,17 @@ bool startingIsWhites[8][8] = {{false, false, false, false, false, false, false,
                                {false, false, false, true, false, false, false, false},
                                {true,  true,  true,  true,  true,  true,  true,  true},
                                {true,  true,  true,  true,  true,  true,  true,  true}};
+bool startingDidMove[8][8] = {{false, false, false, false, false, false, false, false},
+                              {false, false, false, false, false, false, false, false},
+                              {false, false, false, false, false, false, false, false},
+                              {false, false, false, false, false, false, false, false},
+                              {false, false, false, false, false, false, false, false},
+                              {false, false, false, false, false, false, false, false},
+                              {false, false, false, false, false, false, false, false},
+                              {false, false, false, false, false, false, false, false}};
+
 int main() {
-    Board startingBoard(startingIDs, startingIsWhites);
-    evalInfo intermediateInfo{};
-    float rating = Evaluator::getExpectedRating(startingBoard, 6, true, intermediateInfo);
-    cout << rating << endl;
-    cout << Evaluator::getAMT() << endl;
+    Mover::moveLite toDo = Mover::getOptimalMove(startingIDs, startingIsWhites, startingDidMove, {-1, -1}, true, 6);
+    cout << "(" << toDo.start.row << " " << toDo.start.col << ")" << " to " << "(" << toDo.end.row << " " << toDo.end.col << ")" << endl;
     return 0;
 }
