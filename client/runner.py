@@ -51,7 +51,10 @@ class Sound:
         looping.remove(self)
 
     def playing(self):
-        return time.time() - self.last_start > self.cur_sound.get_length()
+        return time.time() - self.last_start < self.cur_sound.get_length()
+
+    def set_volume(self, new_vol):
+        self.cur_sound.set_volume(new_vol)
 
 
 class Application:
@@ -86,8 +89,7 @@ class Application:
                 if not sound.playing():
                     sound.play()
 
-            mouse_x = pygame.mouse.get_pos()[0]
-            mouse_y = pygame.mouse.get_pos()[1]
+            mouse_x, mouse_y = pygame.mouse.get_pos()
             self.draw()
             pygame.display.update()
 
@@ -141,3 +143,7 @@ def fill(r, g, b):
 def image(to_add: Image, x, y, alpha=255):
     to_add.set_alpha(alpha)
     main_application.screen.blit(to_add.surface, (x, y))
+
+
+def get_mouse_pos():
+    return mouse_x, mouse_y
