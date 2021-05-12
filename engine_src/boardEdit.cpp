@@ -170,7 +170,7 @@ Board::Board(int id[8][8], bool isWhite[8][8], coord doubleMoved, bool didMove[8
     for (int r = 0; r < ROWS; ++r)
         for (int c = 0; c < COLS; ++c)
             if (id[r][c] != EMPTY) {
-                if(r == doubleMoved.row && c == doubleMoved.col)
+                if (r == doubleMoved.row && c == doubleMoved.col)
                     this->pieces[numPieces] = {id[r][c], isWhite[r][c], didMove[r][c], this->moveNum};
                 else
                     this->pieces[numPieces] = {id[r][c], isWhite[r][c], didMove[r][c], NEVERDOUBLEMOVED_VAL};
@@ -183,4 +183,27 @@ Board::Board(int id[8][8], bool isWhite[8][8], coord doubleMoved, bool didMove[8
                         this->blackKing = {r, c};
                 }
             }
+}
+
+void printTurn(turn &toPrint) {
+    std::cout << toPrint.numMoves << std::endl;
+    for (int i = 0; i < toPrint.numMoves; ++i) {
+        switch (toPrint.moves[i].type) {
+            case MOVE:
+                std::cout << "M " << toPrint.moves[i].start.row << " " << toPrint.moves[i].start.col << " "
+                          << toPrint.moves[i].end.row << " " << toPrint.moves[i].end.col << std::endl;
+                break;
+            case PROMOTE:
+                std::cout << "P " << toPrint.moves[i].start.row << " " << toPrint.moves[i].start.col << " "
+                          << toPrint.moves[i].promotionID << std::endl;
+                break;
+            case REMOVE:
+                std::cout << "R " << toPrint.moves[i].start.row << " " << toPrint.moves[i].start.col << std::endl;
+                break;
+            case DOUBLEPAWN_MOVE:
+                std::cout << "DM " << toPrint.moves[i].start.row << " " << toPrint.moves[i].start.col << " "
+                          << toPrint.moves[i].end.row << " " << toPrint.moves[i].end.col << std::endl;
+                break;
+        }
+    }
 }

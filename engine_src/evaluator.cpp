@@ -3,7 +3,6 @@
 //
 
 #include <iostream>
-#include <thread>
 #include <chrono>
 #include "program.h"
 
@@ -24,8 +23,9 @@ namespace Evaluator {
         preprocess::fillAttacked(curBoard, stepper.attackedSquares[layers], whiteToMove);
 
         stepper.numMoves[layers] = 0;
-        fillMoves::fillValidMoves(curBoard, whiteToMove, stepper.threats[layers], numThreats,
-                                  stepper.attackedSquares[layers], stepper.possibleMoves[layers], stepper.numMoves[layers]);
+        stepper.numMoves[layers] = fillMoves::fillValidMoves(curBoard, whiteToMove, stepper.threats[layers], numThreats,
+                                                             stepper.attackedSquares[layers],
+                                                             stepper.possibleMoves[layers]);
 
         float optimal = whiteToMove ? FLOAT_MIN : FLOAT_MAX;
         for (int turnInd = 0; turnInd < stepper.numMoves[layers]; ++turnInd) {
@@ -45,7 +45,9 @@ namespace Evaluator {
         return optimal;
     }
 
-    void setExpectedRating(int startingIDs[ROWS][COLS], bool startingIsWhite[ROWS][COLS], bool startingDidMove[ROWS][COLS], coord moved, turn toDo, int layers, bool whiteToMove, float &returnTo){
+    void
+    setExpectedRating(int startingIDs[ROWS][COLS], bool startingIsWhite[ROWS][COLS], bool startingDidMove[ROWS][COLS],
+                      coord moved, turn toDo, int layers, bool whiteToMove, float &returnTo) {
         evalInfo info{};
         class Board b(startingIDs, startingIsWhite, moved, startingDidMove);
         boardEdit::doTurn(toDo, b);

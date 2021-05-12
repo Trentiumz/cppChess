@@ -1,4 +1,5 @@
 from runner import *
+from chess import *
 
 total_dim = 800
 piece_dim = total_dim // 8
@@ -87,6 +88,7 @@ class ChessApplication(Application):
 
     def setup(self):
         cur_state.setup()
+        Board()
 
     def mouse_pressed(self, event):
         cur_state.mouse_pressed(event)

@@ -41,6 +41,8 @@ const int promoteables[4] = {BISHOP, KNIGHT, ROOK, QUEEN};
 
 #define MAX_MOVES 500
 
+#define LAYERS 6
+
 const float pieceRatings[ELEMENT_TYPES] = {10, 30, 35, 50, 90, 300};
 
 // Piece structure for inputting
@@ -115,8 +117,8 @@ bool operator==(const coord &first, const coord &second);
 bool operator!=(const coord &first, const coord &second);
 
 namespace fillMoves{
-    void fillValidMoves(class Board &curBoard, bool whiteToMove, coord threats[ROWS * COLS], int numThreats,
-                        bool attackedSquares[ROWS][COLS], turn turns[MAX_MOVES_PER_TURN], int& numMoves);
+    int fillValidMoves(class Board &curBoard, bool whiteToMove, coord threats[ROWS * COLS], int numThreats,
+                       bool attackedSquares[ROWS][COLS], turn turns[MAX_MOVES_PER_TURN]);
 }
 namespace preprocess{
     int fillThreats(class Board &curBoard, bool whiteToMove, coord threats[ROWS * COLS]);
@@ -145,7 +147,9 @@ namespace Mover{
         coord start, end;
         int promotionID;
     };
-    moveLite getOptimalMove(int startingIDs[ROWS][COLS], bool startingIsWhites[ROWS][COLS], bool startingDidMove[ROWS][COLS], coord doubleMove, bool whiteToMove, int layers);
+    turn getOptimalMove(int startingIDs[ROWS][COLS], bool startingIsWhites[ROWS][COLS], bool startingDidMove[ROWS][COLS], coord doubleMove, bool whiteToMove, int layers);
 }
+
+void printTurn(turn &toPrint);
 
 #endif //CHESSENGINE_PROGRAM_H

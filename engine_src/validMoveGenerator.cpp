@@ -292,13 +292,15 @@ namespace fillMoves {
         }
     }
 
-    void fillValidMoves(class Board &curBoard, bool whiteToMove, coord threats[ROWS * COLS], int numThreats,
-                        bool attackedSquares[ROWS][COLS], turn turns[MAX_MOVES_PER_TURN], int& numMoves) {
+    int fillValidMoves(class Board &curBoard, bool whiteToMove, coord threats[ROWS * COLS], int numThreats,
+                        bool attackedSquares[ROWS][COLS], turn turns[MAX_MOVES_PER_TURN]) {
+        int numMoves = 0;
         for (int r = 0; r < ROWS; ++r)
             for (int c = 0; c < COLS; ++c) {
                 if (curBoard.board[r][c] && curBoard.board[r][c]->isWhite == whiteToMove) {
                     addMoves(curBoard, {r, c}, threats, numThreats, turns, numMoves, attackedSquares);
                 }
             }
+        return numMoves;
     }
 }
